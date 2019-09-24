@@ -44,12 +44,14 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
         showProgress?.value = true
 
         val playersFrmDB: Flowable<List<Player>> = playerRepo.getDBTeamPlayers(teamId)
+        compositeDisposable.add(
         playersFrmDB
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({t -> createTeamPlayers(t)
                 showDBGetSuccess?.value = true
                 showProgress?.value = false },{showDBGetSuccess?.postValue(false)})
+        )
     }
 
     fun onShowDBPlayers() : MutableLiveData<List<Player>>?{
@@ -70,12 +72,14 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
 
         val allTeamPlayersObservable: Observable<PlayersListModel> = playerRepo.getPlayersList(teamId)
 
+      compositeDisposable.add(
         allTeamPlayersObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             //    .subscribe(teamObserver())
             .subscribe({t-> createPlayerList(t)
                 showProgress?.value = false})
+      )
     }
 
     fun onShowPlayerList() : MutableLiveData<PlayersListModel>?{

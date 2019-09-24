@@ -63,7 +63,7 @@ class PlayerFragment : Fragment() {
             override fun onChanged(t: List<Player>) {
                 Log.i("PlayerFragmentDBGet", "${t?.get(0).strPlayer}")
 
-                val adapter: PlayerDBAdapter =
+                val adapter =
                     PlayerDBAdapter(
                         t!!,
                         object :
@@ -79,18 +79,20 @@ class PlayerFragment : Fragment() {
                                     ?.getSupportFragmentManager()!!
                                     .beginTransaction()
                                 transaction.replace(R.id.frm_container, fragobj)
+                                    .addToBackStack(null)
                                     .commit()
                             }
                         })
-                rv_list.layoutManager = LinearLayoutManager(activity)
-                rv_list.adapter = adapter
+                rv_player_list.layoutManager = LinearLayoutManager(activity)
+                rv_player_list.adapter = adapter
+
 
             }
         })//end of DB call
 
 
        //Call to Network
-        viewModel.getAllTeamPlayers(teamId)
+ //       viewModel.getAllTeamPlayers(teamId)
 
         displayProgress?.observe(this, object : Observer<Boolean> {
             override fun onChanged(t: Boolean?) {
@@ -121,6 +123,7 @@ class PlayerFragment : Fragment() {
                                     ?.getSupportFragmentManager()!!
                                     .beginTransaction()
                                 transaction.replace(R.id.frm_container, fragobj)
+                                    .addToBackStack(null)
                                     .commit()
 
                             }

@@ -43,12 +43,13 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
         showProgress?.value = true
 
         val teamsFrmDB: Flowable<List<Teams>> = teamRepository.getTeamsFrmDB()
+        compositeDisposable.add(
         teamsFrmDB
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({t -> makeDBTeam(t)
+            .subscribe({t -> teamsFromDb?.postValue(t)
                 showDBGetSuccess?.value = true
-                showProgress?.value = false },{showDBGetSuccess?.postValue(false)})
+                showProgress?.value = false },{showDBGetSuccess?.postValue(false)}))
     }
 
     fun onShowDBTeam() : MutableLiveData<List<Teams>>?{
@@ -67,12 +68,13 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
 
         val teamModelObservable: Observable<TeamsModel> = teamRepository.getTeamRecords()
 
+        compositeDisposable.add(
         teamModelObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             //    .subscribe(teamObserver())
             .subscribe({t-> makeTeam(t)
-                showProgress?.value = false})
+                showProgress?.value = false}))
     }
 
 

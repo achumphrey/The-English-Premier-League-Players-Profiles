@@ -12,7 +12,7 @@ import io.reactivex.Flowable
 @Dao
 interface PlayerDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertPlayers(players: List<Player>): Completable
 
 

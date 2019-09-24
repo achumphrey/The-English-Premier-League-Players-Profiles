@@ -17,91 +17,91 @@
         android:padding="@dimen/parent_padd">
 
         <TextView
-            android:id="@+id/tv_player_name"
+            android:id="@+id/tv_player_name_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="@dimen/tv_top_end"
             android:layout_marginEnd="8dp"
-            android:text="Player Name"
+            tools:text="Player Name"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.064"
-            app:layout_constraintStart_toEndOf="@+id/iv_team_logo"
+            app:layout_constraintStart_toEndOf="@+id/iv_team_logo_db"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_date_born"
+            android:id="@+id/tv_date_born_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
-            android:text="Date Born"
+            tools:text="Date Born"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tv_player_name"
-            app:layout_constraintTop_toBottomOf="@+id/tv_player_name" />
+            app:layout_constraintStart_toStartOf="@+id/tv_player_name_db"
+            app:layout_constraintTop_toBottomOf="@+id/tv_player_name_db" />
 
         <TextView
-            android:id="@+id/tv_nationality"
+            android:id="@+id/tv_nationality_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
-            android:text="Nationality"
+            tools:text="Nationality"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tv_date_born"
-            app:layout_constraintTop_toBottomOf="@+id/tv_date_born" />
+            app:layout_constraintStart_toStartOf="@+id/tv_date_born_db"
+            app:layout_constraintTop_toBottomOf="@+id/tv_date_born_db" />
 
         <TextView
-            android:id="@+id/tv_height"
+            android:id="@+id/tv_height_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
-            android:text="Height"
+            tools:text="Height"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tv_nationality"
-            app:layout_constraintTop_toBottomOf="@+id/tv_nationality" />
+            app:layout_constraintStart_toStartOf="@+id/tv_nationality_db"
+            app:layout_constraintTop_toBottomOf="@+id/tv_nationality_db" />
 
         <TextView
-            android:id="@+id/tv_position"
+            android:id="@+id/tv_position_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
-            android:text="Position"
+            tools:text="Position"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tv_height"
-            app:layout_constraintTop_toBottomOf="@+id/tv_height" />
+            app:layout_constraintStart_toStartOf="@+id/tv_height_db"
+            app:layout_constraintTop_toBottomOf="@+id/tv_height_db" />
 
         <TextView
-            android:id="@+id/tv_wage"
+            android:id="@+id/tv_wage_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
-            android:text="Wage"
+            tools:text="Wage"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tv_position"
-            app:layout_constraintTop_toBottomOf="@+id/tv_position" />
+            app:layout_constraintStart_toStartOf="@+id/tv_position_db"
+            app:layout_constraintTop_toBottomOf="@+id/tv_position_db" />
 
         <ImageView
-            android:id="@+id/iv_team_logo"
+            android:id="@+id/iv_team_logo_db"
             android:layout_width="133dp"
             android:layout_height="187dp"
             android:layout_marginStart="@dimen/img_marg_all"
@@ -112,7 +112,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.173"
-            app:srcCompat="@mipmap/ic_launcher" />
+            tools:srcCompat="@mipmap/ic_launcher" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

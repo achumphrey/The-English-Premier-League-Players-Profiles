@@ -46,13 +46,13 @@ class PlayerDBViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
-    val tvPlayerName = view.tv_player_name
-    val imgView = view.iv_team_logo
-    val tvDateBorn = view.tv_date_born
-    val tvNationality = view.tv_nationality
-    val tvPosition = view.tv_position
-    val tvHeight = view.tv_height
-    val tvWage = view.tv_wage
+    val tvPlayerName = view.tv_player_name_db
+    val imgView = view.iv_team_logo_db
+    val tvDateBorn = view.tv_date_born_db
+    val tvNationality = view.tv_nationality_db
+    val tvPosition = view.tv_position_db
+    val tvHeight = view.tv_height_db
+    val tvWage = view.tv_wage_db
 }
 
 interface OnPlayerDBClickListener {

@@ -4,13 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.theenglishpremierleagueplayersprofiles.model.playerdetails.Players
 import com.example.theenglishpremierleagueplayersprofiles.model.playerlist.Player
 import com.example.theenglishpremierleagueplayersprofiles.model.teamlist.Teams
 
-@Database(entities = arrayOf(Teams::class, Player::class), version = 1, exportSchema = false)
+@Database(entities = arrayOf(Teams::class, Player::class, Players::class), version = 3, exportSchema = false)
 abstract class TeamDatabase : RoomDatabase() {
 
     abstract fun teamDao():TeamDao
+    abstract fun playerDao():PlayerDao
+    abstract fun playerDetailsDao():PlayerDetailsDao
+
 
     companion object{
 
@@ -26,6 +30,7 @@ abstract class TeamDatabase : RoomDatabase() {
             synchronized(this){
                 val instance = Room.databaseBuilder(context.applicationContext,
                     TeamDatabase::class.java,"team_database")
+                    .fallbackToDestructiveMigration()
                     .build()
 
                 INSTANCE = instance

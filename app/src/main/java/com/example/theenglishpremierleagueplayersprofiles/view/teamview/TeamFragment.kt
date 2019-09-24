@@ -54,7 +54,7 @@ class TeamFragment : Fragment() {
 
 
         // Call to DB
-  //      viewModel.getTeamsFromDB()
+        viewModel.getTeamsFromDB()
 
         teamDB?.observe(this, object : Observer<List<Teams>>{
             override fun onChanged(t: List<Teams>) {
@@ -76,6 +76,7 @@ class TeamFragment : Fragment() {
                                     ?.getSupportFragmentManager()!!
                                     .beginTransaction()
                                 transaction.replace(R.id.frm_container, fragobj)
+                                    .addToBackStack(null)
                                     .commit()
                             }
                         })
@@ -86,7 +87,7 @@ class TeamFragment : Fragment() {
         })//end of DB call
 
         // Call to network
-        viewModel.getTeamRecords()
+  //      viewModel.getTeamRecords()
 
         displayProgress?.observe(this, object : Observer<Boolean> {
             override fun onChanged(t: Boolean?) {
@@ -117,6 +118,7 @@ class TeamFragment : Fragment() {
                                     ?.getSupportFragmentManager()!!
                                     .beginTransaction()
                                 transaction.replace(R.id.frm_container, fragobj)
+                                    .addToBackStack(null)
                                     .commit()
                             }
                         })

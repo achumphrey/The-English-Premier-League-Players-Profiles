@@ -13,7 +13,9 @@ import androidx.lifecycle.ViewModelProviders
 import com.example.theenglishpremierleagueplayersprofiles.R
 import com.example.theenglishpremierleagueplayersprofiles.common.loadImage
 import com.example.theenglishpremierleagueplayersprofiles.dagger.*
+import com.example.theenglishpremierleagueplayersprofiles.model.playerdetails.Players
 import com.example.theenglishpremierleagueplayersprofiles.model.playerdetails.PlayersDetailsModel
+import com.example.theenglishpremierleagueplayersprofiles.model.playerlist.Player
 import kotlinx.android.synthetic.main.fragment_players.*
 import javax.inject.Inject
 
@@ -40,11 +42,30 @@ class PlayersDetailsFragment : Fragment() {
 
         val playerDetails : MutableLiveData<PlayersDetailsModel>? = viewModel.onShowPlayerInfo()
         val displayProgress : MutableLiveData<Boolean>? = viewModel.getShowProgress()
+        val playerFrmDB : MutableLiveData<Players>? = viewModel.onShowDBPlayer()
+        val showDBGetProgress : MutableLiveData<Boolean>? = viewModel.getShowDBGetSuccess()
+        val showDBAddSuccess: MutableLiveData<Boolean>? = viewModel.getShowDBAddSuccess()
         var playerId = arguments?.getString("message")
+        var playerIdInt: Int = Integer.parseInt(playerId!!)
 
+
+        // Call from DB
+        viewModel.getPlayerFromDB(playerIdInt)
+
+        playerFrmDB?.observe(this, object: Observer<Players>{
+            override fun onChanged(t: Players?) {
+                Log.i("PlayerDtFragmentDB", "${t!!.strPlayer}")
+
+                tv_description.text = t.strDescriptionEN
+                img_view.loadImage(t.strCutout)
+                tv_name.text = t.strPlayer
+                tv_team.text = t.strTeam
+            }
+        })
+        // End of Call to DB
 
         // Call to Network
-        viewModel.getOnePlayerInfo(playerId!!)
+  //      viewModel.getOnePlayerInfo(playerId!!)
 
         displayProgress?.observe(this, object : Observer<Boolean> {
             override fun onChanged(t: Boolean?) {
@@ -57,7 +78,7 @@ class PlayersDetailsFragment : Fragment() {
 
         playerDetails?.observe(this, object: Observer<PlayersDetailsModel> {
             override fun onChanged(t: PlayersDetailsModel?) {
-                Log.i("TeamFragment", "${t!!.players[0].strPlayer}")
+                Log.i("PlayerDtFragmentNW", "${t!!.players[0].strPlayer}")
 
                 tv_description.text = t.players[0].strDescriptionEN
                 img_view.loadImage(t.players[0].strCutout)
