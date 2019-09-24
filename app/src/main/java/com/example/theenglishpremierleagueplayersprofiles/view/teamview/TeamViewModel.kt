@@ -1,5 +1,7 @@
 package com.example.theenglishpremierleagueplayersprofiles.view.teamview
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -136,6 +138,5 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
         disposable.dispose()
         compositeDisposable.clear()
     }
-
 
 }

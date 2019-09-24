@@ -1,6 +1,8 @@
 package com.example.theenglishpremierleagueplayersprofiles.view.playerdetailsview
 
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -30,6 +32,9 @@ class PlayersDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        var checkInternet: Boolean = amIConnected()
+        Log.i("oncreateVwPlayerDtFrg", "$checkInternet")
+
         DaggerNetworkComponent.builder()
             .networkModule(NetworkModule(activity!!.application))
             .playerRepoModule(PlayerRepoModule())
@@ -49,9 +54,11 @@ class PlayersDetailsFragment : Fragment() {
         var playerIdInt: Int = Integer.parseInt(playerId!!)
 
 
-        // Call from DB
-        viewModel.getPlayerFromDB(playerIdInt)
+        // Check for network connection
+        if (checkInternet)  viewModel.getOnePlayerInfo(playerId!!) else viewModel.getPlayerFromDB(playerIdInt)
 
+
+        // Call from DB
         playerFrmDB?.observe(this, object: Observer<Players>{
             override fun onChanged(t: Players?) {
                 Log.i("PlayerDtFragmentDB", "${t!!.strPlayer}")
@@ -65,8 +72,6 @@ class PlayersDetailsFragment : Fragment() {
         // End of Call to DB
 
         // Call to Network
-  //      viewModel.getOnePlayerInfo(playerId!!)
-
         displayProgress?.observe(this, object : Observer<Boolean> {
             override fun onChanged(t: Boolean?) {
                 if (t == false)
@@ -91,5 +96,10 @@ class PlayersDetailsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_players, container, false)
     }
 
-
+    private fun amIConnected(): Boolean {
+        val connectivityManager = context?.getSystemService(
+            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
 }

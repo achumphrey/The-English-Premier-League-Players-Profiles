@@ -1,7 +1,10 @@
 package com.example.theenglishpremierleagueplayersprofiles.view.teamview
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.util.Log
@@ -38,6 +41,9 @@ class TeamFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        var checkInternet: Boolean = amIConnected()
+        Log.i("oncreateTeamFrg", "$checkInternet")
+
         DaggerNetworkComponent.builder()
             .networkModule(NetworkModule(activity!!.application))
             .repositoryModule(RepositoryModule())
@@ -52,10 +58,10 @@ class TeamFragment : Fragment() {
         val showDBGetProgress : MutableLiveData<Boolean>? = viewModel.getShowDBGetSuccess()
         val showDBAddSuccess: MutableLiveData<Boolean>? = viewModel.getShowDBAddSuccess()
 
+        // Check for network connection
+        if (checkInternet) viewModel.getTeamRecords() else viewModel.getTeamsFromDB()
 
         // Call to DB
-        viewModel.getTeamsFromDB()
-
         teamDB?.observe(this, object : Observer<List<Teams>>{
             override fun onChanged(t: List<Teams>) {
                 Log.i("TeamFragmentDB", "${t?.get(0).strTeam}")
@@ -87,8 +93,6 @@ class TeamFragment : Fragment() {
         })//end of DB call
 
         // Call to network
-  //      viewModel.getTeamRecords()
-
         displayProgress?.observe(this, object : Observer<Boolean> {
             override fun onChanged(t: Boolean?) {
                 if (t == false)
@@ -141,6 +145,27 @@ class TeamFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+    }
+
+   /* fun isConnectedToInternet(): Boolean {
+        val connectivity = context?.getSystemService(
+            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivity != null) {
+            val info = connectivity.allNetworkInfo
+            if (info != null)
+                for (i in info.indices)
+                    if (info[i].state == NetworkInfo.State.CONNECTED) {
+                        return true
+                    }
+        }
+        return false
+    }*/
+
+    private fun amIConnected(): Boolean {
+        val connectivityManager = context?.getSystemService(
+            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 }
 
