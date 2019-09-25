@@ -59,7 +59,7 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
     }
 
     private fun makeDBTeam(teamsDB: List<Teams>) {
-        Log.i("TeamViewModelDB", "${teamsDB[0].strTeam}")
+        Log.i(TAGTVMDB, "${teamsDB[0].strTeam}")
         teamsFromDb?.value = teamsDB
     }
     //end of database call
@@ -85,7 +85,7 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
     }
 
     private fun makeTeam(teamsList: TeamsModel) {
-        Log.i("TeamViewModelNW", "${teamsList.teams[1].strTeam}")
+        Log.i(TAGTVMNW, "${teamsList.teams[1].strTeam}")
         teamList?.value = teamsList
 
         addTeamToDB(teamsList)
@@ -119,7 +119,7 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
             }
 
             override fun onError(e: Throwable) {
-                Log.i("TeamViewModel", "something went wrong")
+                Log.i(TAGTVM, "something went wrong")
             }
         }
 
@@ -127,7 +127,7 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        Log.i("TeamViewModel", "ViewModel destroyed")
+        Log.i(TAGTVM, "ViewModel destroyed")
     }
 
     fun showError(){
@@ -137,6 +137,12 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
     fun onDestroy() {
         disposable.dispose()
         compositeDisposable.clear()
+    }
+
+    companion object{
+        const val TAGTVM = "TeamViewModel"
+        const val TAGTVMNW = "TeamViewModelNW"
+        const val TAGTVMDB = "TeamViewModelDB"
     }
 
 }

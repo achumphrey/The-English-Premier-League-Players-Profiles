@@ -44,7 +44,7 @@ class PlayerFragment : Fragment() {
     ): View? {
 
         var checkInternet: Boolean = amIConnected()
-        Log.i("oncreatePlayerFrg", "$checkInternet")
+        Log.i(TAGPFG_CHK_INT, "$checkInternet")
 
         DaggerNetworkComponent.builder()
             .networkModule(NetworkModule(activity!!.application))
@@ -68,7 +68,7 @@ class PlayerFragment : Fragment() {
        // Call to DB
         playersDB?.observe(this, object : Observer<List<Player>>{
             override fun onChanged(t: List<Player>) {
-                Log.i("PlayerFragmentDBGet", "${t?.get(0).strPlayer}")
+                Log.i(TAGPFGDB, "${t?.get(0).strPlayer}")
 
                 val adapter =
                     PlayerDBAdapter(
@@ -92,8 +92,6 @@ class PlayerFragment : Fragment() {
                         })
                 rv_player_list.layoutManager = LinearLayoutManager(activity)
                 rv_player_list.adapter = adapter
-
-
             }
         })//end of DB call
 
@@ -110,7 +108,7 @@ class PlayerFragment : Fragment() {
 
         playerList?.observe(this, object: Observer<PlayersListModel> {
             override fun onChanged(t: PlayersListModel?) {
-                Log.i("PlayerFragmentNW","${t!!.player[1].strPlayer}")
+                Log.i(TAGPFGNW,"${t!!.player[1].strPlayer}")
 
                 val adapter: PlayersAdapter =
                     PlayersAdapter(
@@ -136,16 +134,16 @@ class PlayerFragment : Fragment() {
                 rv_player_list.layoutManager = LinearLayoutManager(activity)
                 rv_player_list.adapter = adapter
             }
-        })
+        })// End of Network Call
+
         return inflater.inflate(R.layout.player_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-        // TODO: Use the ViewModel
     }
 
+    // Check for Network Connection
     private fun amIConnected(): Boolean {
         val connectivityManager = context?.getSystemService(
             Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -153,4 +151,9 @@ class PlayerFragment : Fragment() {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
+    companion object{
+        const val TAGPFGNW = "PlayerFragmentNW"
+        const val TAGPFGDB = "PlayerFragmentDBGet"
+        const val TAGPFG_CHK_INT = "oncreateViewPlayerFrg"
+    }
 }

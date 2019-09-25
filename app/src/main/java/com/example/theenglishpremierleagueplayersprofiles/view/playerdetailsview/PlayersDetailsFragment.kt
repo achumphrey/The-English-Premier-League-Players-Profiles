@@ -17,7 +17,6 @@ import com.example.theenglishpremierleagueplayersprofiles.common.loadImage
 import com.example.theenglishpremierleagueplayersprofiles.dagger.*
 import com.example.theenglishpremierleagueplayersprofiles.model.playerdetails.Players
 import com.example.theenglishpremierleagueplayersprofiles.model.playerdetails.PlayersDetailsModel
-import com.example.theenglishpremierleagueplayersprofiles.model.playerlist.Player
 import kotlinx.android.synthetic.main.fragment_players.*
 import javax.inject.Inject
 
@@ -33,7 +32,7 @@ class PlayersDetailsFragment : Fragment() {
     ): View? {
 
         var checkInternet: Boolean = amIConnected()
-        Log.i("oncreateVwPlayerDtFrg", "$checkInternet")
+        Log.i(TAGPFGD_CHK_INT, "$checkInternet")
 
         DaggerNetworkComponent.builder()
             .networkModule(NetworkModule(activity!!.application))
@@ -57,11 +56,10 @@ class PlayersDetailsFragment : Fragment() {
         // Check for network connection
         if (checkInternet)  viewModel.getOnePlayerInfo(playerId!!) else viewModel.getPlayerFromDB(playerIdInt)
 
-
         // Call from DB
         playerFrmDB?.observe(this, object: Observer<Players>{
             override fun onChanged(t: Players?) {
-                Log.i("PlayerDtFragmentDB", "${t!!.strPlayer}")
+                Log.i(TAGPFGDDB, "${t!!.strPlayer}")
 
                 tv_description.text = t.strDescriptionEN
                 img_view.loadImage(t.strCutout)
@@ -83,7 +81,7 @@ class PlayersDetailsFragment : Fragment() {
 
         playerDetails?.observe(this, object: Observer<PlayersDetailsModel> {
             override fun onChanged(t: PlayersDetailsModel?) {
-                Log.i("PlayerDtFragmentNW", "${t!!.players[0].strPlayer}")
+                Log.i(TAGPFDGNW, "${t!!.players[0].strPlayer}")
 
                 tv_description.text = t.players[0].strDescriptionEN
                 img_view.loadImage(t.players[0].strCutout)
@@ -91,15 +89,23 @@ class PlayersDetailsFragment : Fragment() {
                 tv_team.text = t.players[0].strTeam
 
             }
-        })
+        })// End of call to network
+
                 // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_players, container, false)
     }
 
+    // Check for Network Connection
     private fun amIConnected(): Boolean {
         val connectivityManager = context?.getSystemService(
             Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+
+    companion object{
+        const val TAGPFDGNW = "PlayerDtFragmentNW"
+        const val TAGPFGDDB = "PlayerDtFragmentDB"
+        const val TAGPFGD_CHK_INT = "oncreateVwPlayerDtFrg"
     }
 }

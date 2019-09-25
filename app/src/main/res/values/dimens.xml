@@ -5,4 +5,18 @@
     <dimen name="img_marg_all">8dp</dimen>
     <dimen name="parent_padd">10dp</dimen>
     <dimen name="tv_top_end">8dp</dimen>
+    <dimen name="marg_lay_8">8dp</dimen>
+    <dimen name="tv_name_size">20sp</dimen>
+    <dimen name="tv_err_txt_size">30sp</dimen>
+    <dimen name="tv_name_frg_dt">48dp</dimen>
+    <dimen name="tv_name_25">25sp</dimen>
+    <dimen name="mrg_top_32">32dp</dimen>
+    <dimen name="pad_8">8sp</dimen>
+    <dimen name="mrg_top_100">100dp</dimen>
+    <dimen name="mrg_top_15">15dp</dimen>
+    <dimen name="mrg_24">24dp</dimen>
+    <dimen name="mrg_top_48">48dp</dimen>
+    <dimen name="mrg_end_50">50dp</dimen>
+    <dimen name="txt_size_25">25sp</dimen>
+    <dimen name="mrg_tp_100">100dp</dimen>
 </resources>

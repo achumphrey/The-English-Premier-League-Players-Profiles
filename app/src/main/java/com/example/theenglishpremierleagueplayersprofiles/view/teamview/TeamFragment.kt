@@ -42,7 +42,7 @@ class TeamFragment : Fragment() {
     ): View? {
 
         var checkInternet: Boolean = amIConnected()
-        Log.i("oncreateTeamFrg", "$checkInternet")
+        Log.i(TAGTFG_CHK_INT, "$checkInternet")
 
         DaggerNetworkComponent.builder()
             .networkModule(NetworkModule(activity!!.application))
@@ -64,7 +64,7 @@ class TeamFragment : Fragment() {
         // Call to DB
         teamDB?.observe(this, object : Observer<List<Teams>>{
             override fun onChanged(t: List<Teams>) {
-                Log.i("TeamFragmentDB", "${t?.get(0).strTeam}")
+                Log.i(TAGTFGDB, "${t?.get(0).strTeam}")
 
                 val adapter: TeamDBAdapter =
                     TeamDBAdapter(
@@ -104,7 +104,7 @@ class TeamFragment : Fragment() {
 
         teams?.observe(this, object: Observer<TeamsModel> {
             override fun onChanged(t: TeamsModel?) {
-                Log.i("TeamFragmentNW","${t!!.teams[0].strTeam}")
+                Log.i(TAGTFGNW,"${t!!.teams[0].strTeam}")
 
                 val adapter: TeamAdapter =
                                 TeamAdapter(
@@ -129,7 +129,7 @@ class TeamFragment : Fragment() {
                     rv_list.layoutManager = LinearLayoutManager(activity)
                     rv_list.adapter = adapter
             }
-        })
+        })//end of network call
 
         showDBAddSuccess?.observe(this, object : Observer<Boolean>{
             override fun onChanged(t: Boolean?) {
@@ -161,11 +161,18 @@ class TeamFragment : Fragment() {
         return false
     }*/
 
+    // Check for Network Connection
     private fun amIConnected(): Boolean {
         val connectivityManager = context?.getSystemService(
             Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+
+    companion object{
+        const val TAGTFGNW = "TeamFragmentNW"
+        const val TAGTFGDB = "TeamFragmentDB"
+        const val TAGTFG_CHK_INT = "oncreateViewTeamFrg"
     }
 }
 

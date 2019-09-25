@@ -59,7 +59,7 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
     }
 
     private fun createTeamPlayers(playersDB: List<Player>) {
-        Log.i("PlayerViewModelDBGet", "${playersDB[0].strPlayer}")
+        Log.i(TAGPVMDB, "${playersDB[0].strPlayer}")
         playersFromDb?.value = playersDB
     }
 
@@ -87,7 +87,7 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
     }
 
     private fun createPlayerList(players: PlayersListModel) {
-        Log.i("PlayerViewModelNW", "${players.player[0].strPlayer}")
+        Log.i(TAGPVMNW, "${players.player[0].strPlayer}")
         playersList?.value = players
 
         addPlayersToDB(players)
@@ -121,14 +121,14 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
             }
 
             override fun onError(e: Throwable) {
-                Log.i("TeamViewModel", "something went wrong")
+                Log.i(TAGPVM, "something went wrong")
             }
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-        Log.i("TeamViewModel", "ViewModel destroyed")
+        Log.i(TAGPVM, "ViewModel destroyed")
     }
 
     fun showError(){
@@ -138,5 +138,11 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
     fun onDestroy() {
         disposable.dispose()
         compositeDisposable.clear()
+    }
+
+    companion object{
+        const val TAGPVM = "PlayerViewModel"
+        const val TAGPVMNW = "PlayerViewModelNW"
+        const val TAGPVMDB = "PlayerViewModelDBGet"
     }
 }

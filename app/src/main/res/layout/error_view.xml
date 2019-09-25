@@ -9,8 +9,8 @@
         android:layout_height="match_parent"
         android:id="@+id/error_id"
         android:textStyle="bold"
-        android:textSize="30sp"
-        android:text="something went wrong"
+        android:textSize="@dimen/tv_err_txt_size"
+        android:text="@string/something_went_wrong"
         android:layout_gravity="center_horizontal"
         android:gravity="center" />
 
