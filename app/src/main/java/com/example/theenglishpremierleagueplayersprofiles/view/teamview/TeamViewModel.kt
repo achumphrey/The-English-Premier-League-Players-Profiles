@@ -47,6 +47,9 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
         val teamsFrmDB: Flowable<List<Teams>> = teamRepository.getTeamsFrmDB()
         compositeDisposable.add(
         teamsFrmDB
+            .map {
+                t-> t.distinct().sortedBy { t -> t.strTeam }
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({t -> teamsFromDb?.postValue(t)
