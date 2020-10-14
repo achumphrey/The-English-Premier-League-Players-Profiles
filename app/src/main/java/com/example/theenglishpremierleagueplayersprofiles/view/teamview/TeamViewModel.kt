@@ -1,11 +1,9 @@
 package com.example.theenglishpremierleagueplayersprofiles.view.teamview
 
 import android.content.Context
-import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.theenglishpremierleagueplayersprofiles.model.playerlist.Player
 import com.example.theenglishpremierleagueplayersprofiles.model.teamlist.Teams
 import com.example.theenglishpremierleagueplayersprofiles.model.teamlist.TeamsModel
 import com.example.theenglishpremierleagueplayersprofiles.repository.TeamRepository
@@ -16,16 +14,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
+class TeamViewModel @Inject constructor (val teamRepository: TeamRepository) : ViewModel() {
 
-    private var teamList: MutableLiveData<TeamsModel>? = MutableLiveData()
+    private var teamList: MutableLiveData<List<Teams>>? = MutableLiveData()
     private var showProgress: MutableLiveData<Boolean>? = MutableLiveData()
     var compositeDisposable = CompositeDisposable()
     lateinit var disposable: Disposable
     private var showDBGetSuccess: MutableLiveData<Boolean>? = MutableLiveData()
     private var showDBAddSuccess: MutableLiveData<Boolean>? = MutableLiveData()
     var teamsFromDb: MutableLiveData<List<Teams>>? = MutableLiveData()
+
 
 
     fun getShowProgress():MutableLiveData<Boolean>?{
@@ -44,17 +44,20 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
     fun getTeamsFromDB(){
         showProgress?.value = true
 
-        val teamsFrmDB: Flowable<List<Teams>> = teamRepository.getTeamsFrmDB()
+   //     val teamsFrmDB: Flowable<List<Teams>> = teamRepository.getTeamsFrmDB()
         compositeDisposable.add(
-        teamsFrmDB
-            .map {
-                t-> t.distinct().sortedBy { t -> t.strTeam }
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({t -> teamsFromDb?.postValue(t)
+     //   teamsFrmDB
+            teamRepository.getTeamsFrmDB()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map {
+                    t-> t.distinct().sortedBy { t -> t.strTeam }
+                }
+                .subscribe({t -> teamsFromDb?.postValue(t)
                 showDBGetSuccess?.value = true
-                showProgress?.value = false },{showDBGetSuccess?.postValue(false)}))
+                showProgress?.value = false },{
+                it.printStackTrace()
+                showDBGetSuccess?.postValue(false)}))
     }
 
     fun onShowDBTeam() : MutableLiveData<List<Teams>>?{
@@ -71,25 +74,23 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
     fun getTeamRecords(){
         showProgress?.value = true
 
-        val teamModelObservable: Observable<TeamsModel> = teamRepository.getTeamRecords()
-
         compositeDisposable.add(
-        teamModelObservable
+            teamRepository.getTeamRecords()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            //    .subscribe(teamObserver())
             .subscribe({t-> makeTeam(t)
-                showProgress?.value = false}))
+                showProgress?.value = false},{
+                it.printStackTrace()
+            }))
     }
 
-
-    fun onShowTeamList() : MutableLiveData<TeamsModel>?{
+    fun onShowTeamList() : MutableLiveData<List<Teams>>?{
         return teamList
     }
 
     private fun makeTeam(teamsList: TeamsModel) {
         Log.i(TAGTVMNW, "${teamsList.teams[1].strTeam}")
-        teamList?.value = teamsList
+        teamList?.value = teamsList.teams
 
         addTeamToDB(teamsList)
     }
@@ -105,6 +106,7 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
         )
     }
 
+    //not used
     private fun teamObserver(): Observer<TeamsModel>{
 
         return object : Observer<TeamsModel>{
@@ -118,18 +120,17 @@ class TeamViewModel(val teamRepository: TeamRepository) : ViewModel() {
             override fun onNext(t: TeamsModel) {
                 showProgress?.value = false
                 makeTeam(t)
-
             }
 
             override fun onError(e: Throwable) {
                 Log.i(TAGTVM, "something went wrong")
             }
         }
-
     }
 
     override fun onCleared() {
         super.onCleared()
+        compositeDisposable.clear()
         Log.i(TAGTVM, "ViewModel destroyed")
     }
 

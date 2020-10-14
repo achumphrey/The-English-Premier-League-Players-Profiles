@@ -8,10 +8,11 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = arrayOf(NetworkModule::class,
+@Component(modules = [
+    NetworkModule::class,
     RepositoryModule::class,
     PlayerRepoModule::class,
-    PlayerDetailRepoModule::class))
+    PlayerDetailRepoModule::class])
 interface NetworkComponent {
 
     fun inject(teamFragment: TeamFragment)

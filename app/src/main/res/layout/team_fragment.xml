@@ -29,6 +29,5 @@ tools:context=".view.teamview.TeamFragment">
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     layout="@layout/error_view"
-    android:visibility="gone"
-    />
+    android:visibility="gone" />
 </FrameLayout>

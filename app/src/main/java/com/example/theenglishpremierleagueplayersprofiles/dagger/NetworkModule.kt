@@ -1,6 +1,7 @@
 package com.example.theenglishpremierleagueplayersprofiles.dagger
 
 import android.app.Application
+import android.content.Context
 import com.example.theenglishpremierleagueplayersprofiles.common.Constants
 import com.example.theenglishpremierleagueplayersprofiles.network.ClientInterface
 import dagger.Module
@@ -13,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
-class NetworkModule(private val application: Application) {
+class NetworkModule (private val application: Application){
 
     @Provides
     @Singleton
@@ -25,7 +26,6 @@ class NetworkModule(private val application: Application) {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(okHttpClient)
             .build()
-
     }
 
     @Provides
@@ -37,18 +37,20 @@ class NetworkModule(private val application: Application) {
     @Provides
     @Singleton
     fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient{
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
         return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor).build()
+            .addInterceptor(loggingInterceptor)
+            .build()
     }
 
     @Provides
     @Singleton
-    fun provideClientInterface(retrofit: Retrofit)
+    fun provideClientInterface(retrofit: Retrofit): ClientInterface?
             = retrofit.create(ClientInterface::class.java)
 
     @Provides
     @Singleton
-    fun provideApplicationContext(): Application = application
-
-
+    fun provideApplicationContext(): Application{
+        return application
+    }
 }

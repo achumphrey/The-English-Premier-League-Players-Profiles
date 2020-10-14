@@ -34,6 +34,8 @@ class PlayersDetailsFragment : Fragment() {
         var checkInternet: Boolean = amIConnected()
         Log.i(TAGPFGD_CHK_INT, "$checkInternet")
 
+    //    MyApplication.getComponent().inject(this)
+
         DaggerNetworkComponent.builder()
             .networkModule(NetworkModule(activity!!.application))
             .playerRepoModule(PlayerRepoModule())

@@ -1,9 +1,10 @@
 package com.example.theenglishpremierleagueplayersprofiles.view.teamview
 
-import android.app.Application
+import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.NetworkInfo
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -12,19 +13,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListAdapter
 import android.widget.Toast
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.theenglishpremierleagueplayersprofiles.R
+import com.example.theenglishpremierleagueplayersprofiles.common.NetworkConnection
 import com.example.theenglishpremierleagueplayersprofiles.dagger.DaggerNetworkComponent
 import com.example.theenglishpremierleagueplayersprofiles.dagger.NetworkModule
 import com.example.theenglishpremierleagueplayersprofiles.dagger.RepositoryModule
 import com.example.theenglishpremierleagueplayersprofiles.model.teamlist.Teams
-import com.example.theenglishpremierleagueplayersprofiles.model.teamlist.TeamsModel
 import com.example.theenglishpremierleagueplayersprofiles.view.playersview.PlayerFragment
 import kotlinx.android.synthetic.main.team_fragment.*
 import javax.inject.Inject
@@ -34,28 +32,45 @@ class TeamFragment : Fragment() {
     @Inject
     lateinit var teamModelViewFactory: TeamModelViewFactory
     private lateinit var viewModel: TeamViewModel
+    private lateinit var adapter: TeamAdapter
 
+    private var listener:OnteamClickListener =  object : OnteamClickListener {
+        override fun onTeamClick(teams: Teams) {
+            val bundle = Bundle()
+            bundle.putString("message", teams.idTeam.toString())
+            val fragobj = PlayerFragment()
+            fragobj.arguments = bundle
+
+            val transaction = activity
+                ?.supportFragmentManager!!
+                .beginTransaction()
+            transaction.replace(R.id.frm_container, fragobj)
+                .addToBackStack(null)
+                .commit()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
-        var checkInternet: Boolean = amIConnected()
-        Log.i(TAGTFG_CHK_INT, "$checkInternet")
+        if (isAdded){
+            Log.i("IsAdded?", "$isAdded")
+            NetworkConnection.getComponent().inject(this)
+        }
+        val checkInternet: Boolean = NetworkConnection.checkConnection()
+        Log.i(TAGTFG_CHK_INT, checkInternet.toString())
 
-        DaggerNetworkComponent.builder()
-            .networkModule(NetworkModule(activity!!.application))
-            .repositoryModule(RepositoryModule())
-            .build()
-            .inject(this)
+    //    getNetworkComponent()
 
-        viewModel = ViewModelProviders.of(this, teamModelViewFactory).get(TeamViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, teamModelViewFactory)
+            .get(TeamViewModel::class.java)
 
-        val teams : MutableLiveData<TeamsModel>? = viewModel.onShowTeamList()
+        val teams : MutableLiveData<List<Teams>>? = viewModel.onShowTeamList()
         val displayProgress : MutableLiveData<Boolean>? = viewModel.getShowProgress()
         val teamDB : MutableLiveData<List<Teams>>? = viewModel.onShowDBTeam()
-        val showDBGetProgress : MutableLiveData<Boolean>? = viewModel.getShowDBGetSuccess()
+    //    val showDBGetProgress : MutableLiveData<Boolean>? = viewModel.getShowDBGetSuccess()
         val showDBAddSuccess: MutableLiveData<Boolean>? = viewModel.getShowDBAddSuccess()
 
         // Check for network connection
@@ -64,22 +79,22 @@ class TeamFragment : Fragment() {
         // Call to DB
         teamDB?.observe(this, object : Observer<List<Teams>>{
             override fun onChanged(t: List<Teams>) {
-                Log.i(TAGTFGDB, "${t?.get(0).strTeam}")
+                Log.i(TAGTFGDB, t[0].strTeam)
 
-                val adapter: TeamDBAdapter =
+                val adapter =
                     TeamDBAdapter(
-                        t!!,
+                        t,
                         object :
                             OnTeamDBClickLister {
                             override fun onTeamClick(teams: Teams) {
 
-                                var bundle = Bundle();
-                                bundle.putString("message", teams.idTeam.toString());
-                                var fragobj: PlayerFragment = PlayerFragment()
-                                fragobj!!.arguments = bundle
+                                val bundle = Bundle()
+                                bundle.putString("message", teams.idTeam.toString())
+                                val fragobj = PlayerFragment()
+                                fragobj.arguments = bundle
 
-                                var transaction: FragmentTransaction = getActivity()
-                                    ?.getSupportFragmentManager()!!
+                                val transaction = activity
+                                    ?.supportFragmentManager!!
                                     .beginTransaction()
                                 transaction.replace(R.id.frm_container, fragobj)
                                     .addToBackStack(null)
@@ -102,32 +117,10 @@ class TeamFragment : Fragment() {
             }
         })
 
-        teams?.observe(this, object: Observer<TeamsModel> {
-            override fun onChanged(t: TeamsModel?) {
-                Log.i(TAGTFGNW,"${t!!.teams[0].strTeam}")
-
-                val adapter: TeamAdapter =
-                                TeamAdapter(
-                                    t!!,
-                                    object :
-                                        OnTeamClickLister {
-                                        override fun onTeamClick(teams: Teams) {
-
-                                var bundle = Bundle();
-                                bundle.putString("message", teams.idTeam.toString());
-                                var fragobj: PlayerFragment = PlayerFragment()
-                                fragobj!!.arguments = bundle
-
-                                var transaction: FragmentTransaction = getActivity()
-                                    ?.getSupportFragmentManager()!!
-                                    .beginTransaction()
-                                transaction.replace(R.id.frm_container, fragobj)
-                                    .addToBackStack(null)
-                                    .commit()
-                            }
-                        })
-                    rv_list.layoutManager = LinearLayoutManager(activity)
-                    rv_list.adapter = adapter
+        teams?.observe(this, object: Observer<List<Teams>>{
+            override fun onChanged(t: List<Teams>?) {
+                Log.i(TAGTFGNW,t!![0].strTeam)
+                adapter.updateTeamList(t)
             }
         })//end of network call
 
@@ -143,30 +136,46 @@ class TeamFragment : Fragment() {
         return inflater.inflate(R.layout.team_fragment, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    fun setUpTeamRecyclerView(){
+        adapter = TeamAdapter(mutableListOf(), listener)
+        rv_list.layoutManager = LinearLayoutManager(activity)
+        rv_list.adapter = adapter
     }
 
-   /* fun isConnectedToInternet(): Boolean {
-        val connectivity = context?.getSystemService(
-            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (connectivity != null) {
-            val info = connectivity.allNetworkInfo
-            if (info != null)
-                for (i in info.indices)
-                    if (info[i].state == NetworkInfo.State.CONNECTED) {
-                        return true
-                    }
-        }
-        return false
-    }*/
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        setUpTeamRecyclerView()
+    }
+
+    override fun onAttach(activity: Activity) {
+        super.onAttach(activity)
+        NetworkConnection.getComponent().inject(this)
+    }
+
+    private fun getNetworkComponent(){
+        DaggerNetworkComponent.builder()
+            .networkModule(NetworkModule(activity!!.application))
+            .repositoryModule(RepositoryModule())
+            .build()
+            .inject(this)
+    }
 
     // Check for Network Connection
     private fun amIConnected(): Boolean {
         val connectivityManager = context?.getSystemService(
             Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetworkInfo = connectivityManager.activeNetworkInfo
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            val network: Network? = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager
+                .getNetworkCapabilities(network) //activeNetworkInfo
+            return networkCapabilities != null &&
+                    (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+        }else{
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected
+        }
     }
 
     companion object{

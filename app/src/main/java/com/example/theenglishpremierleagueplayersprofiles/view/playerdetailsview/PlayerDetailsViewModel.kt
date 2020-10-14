@@ -50,7 +50,9 @@ class PlayerDetailsViewModel (val playerDetailRepo: PlayerDetailsRepository) : V
             .subscribeOn(Schedulers.io())
             .subscribe({t -> createTeamPlayer(t)
                 showDBGetSuccess?.value = true
-                showProgress?.value = false },{showDBGetSuccess?.postValue(false)})
+                showProgress?.value = false },{
+                it.printStackTrace()
+                showDBGetSuccess?.postValue(false)})
         )
     }
 
@@ -77,7 +79,9 @@ class PlayerDetailsViewModel (val playerDetailRepo: PlayerDetailsRepository) : V
             .observeOn(AndroidSchedulers.mainThread())
             //    .subscribe(teamObserver())
             .subscribe({t-> createPlayerInfo(t)
-                showProgress?.value = false})
+                showProgress?.value = false},{
+                it.printStackTrace()
+            })
         )
     }
 

@@ -21,4 +21,3 @@ interface ClientInterface {
     @GET("lookupplayer.php")
     fun getAPlayerRecord(@Query("id") playerId : String): Observable<PlayersDetailsModel>
 }
-

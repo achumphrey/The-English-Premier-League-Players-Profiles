@@ -5,12 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.theenglishpremierleagueplayersprofiles.model.playerlist.Player
 import com.example.theenglishpremierleagueplayersprofiles.model.playerlist.PlayersListModel
-import com.example.theenglishpremierleagueplayersprofiles.model.teamlist.Teams
-import com.example.theenglishpremierleagueplayersprofiles.model.teamlist.TeamsModel
 import com.example.theenglishpremierleagueplayersprofiles.repository.PlayerRepository
-import com.example.theenglishpremierleagueplayersprofiles.repository.TeamRepository
-import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -19,7 +14,7 @@ import io.reactivex.schedulers.Schedulers
 
 class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
 
-    private var playersList: MutableLiveData<PlayersListModel>? = MutableLiveData()
+    private var playersList: MutableLiveData<List<Player>>? = MutableLiveData()
     private var showProgress: MutableLiveData<Boolean>? = MutableLiveData()
     var compositeDisposable = CompositeDisposable()
     lateinit var disposable: Disposable
@@ -43,14 +38,15 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
     fun getTeamPlayersFromDB(teamId:Int) {
         showProgress?.value = true
 
-        val playersFrmDB: Flowable<List<Player>> = playerRepo.getDBTeamPlayers(teamId)
         compositeDisposable.add(
-        playersFrmDB
+            playerRepo.getDBTeamPlayers(teamId)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({t -> createTeamPlayers(t)
                 showDBGetSuccess?.value = true
-                showProgress?.value = false },{showDBGetSuccess?.postValue(false)})
+                showProgress?.value = false },{
+                it.printStackTrace()
+                showDBGetSuccess?.postValue(false)})
         )
     }
 
@@ -59,7 +55,7 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
     }
 
     private fun createTeamPlayers(playersDB: List<Player>) {
-        Log.i(TAGPVMDB, "${playersDB[0].strPlayer}")
+        Log.i(TAGPVMDB, playersDB[0].strPlayer)
         playersFromDb?.value = playersDB
     }
 
@@ -69,26 +65,24 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
     fun getAllTeamPlayers(teamId:String?) {
       showProgress?.value = true
 
-
-        val allTeamPlayersObservable: Observable<PlayersListModel> = playerRepo.getPlayersList(teamId)
-
       compositeDisposable.add(
-        allTeamPlayersObservable
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            //    .subscribe(teamObserver())
-            .subscribe({t-> createPlayerList(t)
-                showProgress?.value = false})
+          playerRepo.getPlayersList(teamId)
+              .subscribeOn(Schedulers.io())
+              .observeOn(AndroidSchedulers.mainThread())
+              .subscribe({t-> createPlayerList(t)
+                showProgress?.value = false},{
+                it.printStackTrace()
+            })
       )
     }
 
-    fun onShowPlayerList() : MutableLiveData<PlayersListModel>?{
+    fun onShowPlayerList() : MutableLiveData<List<Player>>?{
         return playersList
     }
 
     private fun createPlayerList(players: PlayersListModel) {
-        Log.i(TAGPVMNW, "${players.player[0].strPlayer}")
-        playersList?.value = players
+        Log.i(TAGPVMNW, players.player[0].strPlayer)
+        playersList?.value = players.player
 
         addPlayersToDB(players)
     }
@@ -100,11 +94,13 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({showDBAddSuccess?.value = true},{
+                    it.printStackTrace()
                     Log.i("ViewModel error",it.message)
                     showDBAddSuccess?.value=false})
         )
     }
 
+    //never used
     private fun playersObserver(): Observer<PlayersListModel> {
 
         return object : Observer<PlayersListModel> {
@@ -128,6 +124,7 @@ class PlayerViewModel (val playerRepo: PlayerRepository) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+        compositeDisposable.clear()
         Log.i(TAGPVM, "ViewModel destroyed")
     }
 
